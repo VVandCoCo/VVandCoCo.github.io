@@ -49,10 +49,7 @@
         /* 每张照片的样式 */
         .photo {
             position: absolute;
-            width: 150px;
-            height: 100px;
             opacity: 0;
-            transform: scale(0.5) rotate(45deg);
             animation: stack 1.5s forwards;
             border: 3px solid white;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -69,17 +66,26 @@
                 transform: scale(1) rotate(0deg);
             }
         }
+
+        /* 动态时间显示的样式 */
+        .time-elapsed {
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>This is our HomePages</h1>
+        <h1>This is our HomePage</h1>
     </header>
     
     <section>
         <article>
-            <h2>from now on</h2>
+            <h2>VV and CoCo</h2>
             <p>2024 7 26</p>
+            <!-- 显示动态时间的元素 -->
+            <p class="time-elapsed" id="timeElapsed"></p>
         </article>
 
         <!-- 照片墙容器 -->
@@ -122,11 +128,12 @@
             'images/25.jpg',
             'images/26.jpg',
             'images/27.jpg',
-
         ];
 
+        // 获取照片墙容器
         const photoWall = document.getElementById('photoWall');
 
+        // 动态插入照片
         photos.forEach((src, index) => {
             const img = document.createElement('img');
             img.src = src;
@@ -136,8 +143,33 @@
             // 随机定位
             img.style.top = `${Math.random() * 60 + 20}%`;
             img.style.left = `${Math.random() * 60 + 20}%`;
+            // 图片保持原始大小
+            img.style.width = 'auto';
+            img.style.height = 'auto';
             photoWall.appendChild(img);
         });
+
+        // 动态显示从指定日期到现在的时间差
+        function updateTimeElapsed() {
+            const targetDate = new Date('2024-07-26T00:00:00'); // 指定日期
+            const now = new Date(); // 当前时间
+
+            // 计算时间差（以毫秒为单位）
+            const timeDiff = now - targetDate;
+
+            // 转换为天、小时、分钟、秒
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+            // 动态更新页面中的时间
+            document.getElementById('timeElapsed').innerHTML = 
+                `It has been ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds .`;
+        }
+
+        // 每秒更新一次时间显示
+        setInterval(updateTimeElapsed, 1000);
     </script>
 </body>
 </html>
