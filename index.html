@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Wall Animation</title>
+    <title>Always With U</title>
     <style>
         /* 通用样式 */
         body {
@@ -142,7 +142,7 @@
             img.src = src;
             img.classList.add('photo');
             // 设置动画延迟，使照片一个接着一个出现
-            img.style.animationDelay = `${index * 0.5}s`;
+            img.style.animationDelay = `${index * 1.5}s`;
             // 随机定位
             img.style.top = `${Math.random() * 60 + 20}%`;
             img.style.left = `${Math.random() * 60 + 20}%`;
@@ -168,7 +168,7 @@
 
             // 动态更新页面中的时间
             document.getElementById('timeElapsed').innerHTML = 
-                `It has been ${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds .`;
+                ` ${days} d, ${hours} h, ${minutes} min, and ${seconds} s `;
         }
 
         // 每秒更新一次时间显示
