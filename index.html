@@ -35,101 +35,11 @@
             bottom: 0;
         }
 
-        /* 照片墙的容器 */
-        .photo-wall {
-            position: relative;
-            width: 80%;
-            height: 400px;
-            margin: 50px auto;
-            border: 5px solid #ccc;
-            background-color: white;
-            overflow: hidden;
-        }
-
-        /* 每张照片的样式 */
-        .photo {
-            position: absolute;
-            max-width: 100px; /* 最大宽度 */
-            max-height: 100px; /* 最大高度 */
-            opacity: 0;
-            animation: stack 1.5s forwards;
-            border: 3px solid white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            object-fit: contain; /* 保持图片比例 */
-        }
-
-        /* 照片堆叠动画 */
-        @keyframes stack {
-            0% {
-                opacity: 0;
-                transform: scale(0.5) rotate(45deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
         /* 动态时间显示的样式 */
         .time-elapsed {
             font-size: 18px;
             color: #333;
             margin-top: 20px;
-        }
-
-        /* 留言板样式 */
-        .message-board {
-            margin: 50px auto 20px;
-            width: 80%;
-            text-align: left;
-        }
-
-        .message-board textarea {
-            width: 100%;
-            height: 100px;
-            font-size: 16px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .message-board button {
-            padding: 10px 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .message-board button:hover {
-            background-color: #555;
-        }
-
-        /* 留言列表样式 */
-        .message-list {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            height: 150px;
-            overflow-y: auto;
-            font-size: 16px;
-        }
-
-        /* 单条留言样式 */
-        .message {
-            opacity: 0;
-            margin-bottom: 10px;
-            animation: showLine 0.5s forwards;
-        }
-
-        /* 留言逐行显示动画 */
-        @keyframes showLine {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
         }
 
         /* 暂停按钮样式 */
@@ -144,13 +54,6 @@
 
         .pause-button:hover {
             background-color: #555;
-        }
-
-        /* 留言时间样式 */
-        .message-time {
-            font-size: 12px;
-            color: #999;
-            margin-left: 10px;
         }
 
     </style>
@@ -170,20 +73,6 @@
             <!-- 暂停/继续倒计时按钮 -->
             <button class="pause-button" id="pauseButton" onclick="toggleTimer()">Pause</button>
         </article>
-
-        <!-- 照片墙容器 -->
-        <div class="photo-wall" id="photoWall">
-            <!-- 照片将通过 JavaScript 动态插入 -->
-        </div>
-
-        <!-- 留言板区域 -->
-        <div class="message-board">
-            <textarea id="messageInput" placeholder="Leave a message..."></textarea>
-            <button onclick="submitMessage()">Submit</button>
-
-            <!-- 留言列表 -->
-            <div class="message-list" id="messageList"></div>
-        </div>
     </section>
 
     <footer>
@@ -191,67 +80,31 @@
     </footer>
 
     <script>
-        // JavaScript 动态加载本地 images 文件夹中的照片
-        const photos = [
-            'images/1.jpg', // 你可以替换成你的图片文件名
-            'images/2.jpg',
-            'images/3.jpg',
-            'images/4.jpg',
-            'images/5.jpg',
-            'images/6.jpg',
-            'images/7.jpg',
-            'images/8.jpg',
-            'images/9.jpg',
-            'images/10.jpg',
-            'images/11.jpg',
-            'images/12.jpg',
-            'images/13.jpg',
-            'images/14.jpg',
-            'images/15.jpg',
-            'images/16.jpg',
-            'images/17.jpg',
-            'images/18.jpg',
-            'images/19.jpg',
-            'images/20.jpg',
-            'images/21.jpg',
-            'images/22.jpg',
-            'images/23.jpg',
-            'images/24.jpg',
-            'images/25.jpg',
-            'images/26.jpg',
-            'images/27.jpg',
-        ];
-
-        // 获取照片墙容器
-        const photoWall = document.getElementById('photoWall');
-
-        // 动态插入照片
-        photos.forEach((src, index) => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.classList.add('photo');
-            // 设置动画延迟，使照片一个接着一个出现
-            img.style.animationDelay = `${index * 1.5}s`;
-            // 随机定位
-            img.style.top = `${Math.random() * 60 + 20}%`;
-            img.style.left = `${Math.random() * 60 + 20}%`;
-            // 限制图片大小，保持等比例
-            img.style.width = 'auto';
-            img.style.height = 'auto';
-            photoWall.appendChild(img);
-        });
-
-        // 时间差的初始计算
-        const targetDate = new Date('2024-07-26T00:00:00'); // 指定日期
+        const targetDate = new Date('2024-07-26T00:00:00'); // 指定目标日期
         let timerInterval = null; // 用于存储 setInterval 的 ID
         let isPaused = false; // 当前倒计时是否暂停
+        let pauseTime = null; // 保存暂停时的时间差
+
+        // 检查 localStorage 中是否有保存的状态
+        if (localStorage.getItem('isPaused') !== null) {
+            isPaused = localStorage.getItem('isPaused') === 'true';
+            if (isPaused && localStorage.getItem('pauseTime') !== null) {
+                pauseTime = parseInt(localStorage.getItem('pauseTime'), 10);
+            }
+        }
 
         // 更新页面中的时间
         function updateTimeElapsed() {
             const now = new Date(); // 当前时间
+            let timeDiff;
 
-            // 计算时间差（以毫秒为单位）
-            const timeDiff = now - targetDate;
+            if (isPaused && pauseTime !== null) {
+                // 如果暂停，使用保存的暂停时间
+                timeDiff = pauseTime;
+            } else {
+                // 否则计算到目标日期的实际时间差
+                timeDiff = now - targetDate;
+            }
 
             // 转换为天、小时、分钟、秒
             const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
@@ -279,56 +132,28 @@
             const pauseButton = document.getElementById('pauseButton');
             if (isPaused) {
                 // 倒计时继续
+                isPaused = false;
                 startTimer();
-                pauseButton.textContent = "Happy Ending/Bad Ending"; // 修改按钮文本
+                pauseButton.textContent = "Pause"; // 修改按钮文本
+                localStorage.setItem('isPaused', 'false');
             } else {
                 // 倒计时暂停
+                isPaused = true;
+                pauseTime = new Date() - targetDate; // 保存当前暂停时的时间差
                 stopTimer();
                 pauseButton.textContent = "Continue"; // 修改按钮文本
-            }
-            isPaused = !isPaused; // 切换状态
-        }
-
-        // 初始启动倒计时
-        startTimer();
-
-        // 留言板功能逻辑
-        const messageList = document.getElementById('messageList');
-
-        function submitMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const messageText = messageInput.value.trim();
-
-            if (messageText) {
-                // 获取当前时间
-                const now = new Date();
-                const formattedTime = formatCurrentTime(now);
-
-                // 创建留言元素
-                const message = document.createElement('div');
-                message.classList.add('message');
-                message.innerHTML = `${messageText} <span class="message-time">${formattedTime}</span>`;
-
-                // 将新留言插入到留言列表中
-                messageList.appendChild(message);
-
-                // 清空输入框
-                messageInput.value = '';
-
-                // 滚动到底部显示最新留言
-                messageList.scrollTop = messageList.scrollHeight;
+                localStorage.setItem('isPaused', 'true');
+                localStorage.setItem('pauseTime', pauseTime.toString());
             }
         }
 
-        // 格式化当前时间为 "YYYY-MM-DD HH:MM:SS"
-        function formatCurrentTime(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        // 页面加载时，根据状态恢复计时器
+        if (!isPaused) {
+            startTimer();
+        } else {
+            // 如果是暂停状态，显示保存的暂停时间
+            updateTimeElapsed();
+            document.getElementById('pauseButton').textContent = "Continue";
         }
     </script>
 </body>
