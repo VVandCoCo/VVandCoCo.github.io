@@ -131,6 +131,28 @@
                 opacity: 1;
             }
         }
+
+        /* 暂停按钮样式 */
+        .pause-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .pause-button:hover {
+            background-color: #555;
+        }
+
+        /* 留言时间样式 */
+        .message-time {
+            font-size: 12px;
+            color: #999;
+            margin-left: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -144,6 +166,9 @@
             <p>2024 7 26</p>
             <!-- 显示动态时间的元素 -->
             <p class="time-elapsed" id="timeElapsed"></p>
+
+            <!-- 暂停/继续倒计时按钮 -->
+            <button class="pause-button" id="pauseButton" onclick="toggleTimer()">Pause</button>
         </article>
 
         <!-- 照片墙容器 -->
@@ -216,9 +241,13 @@
             photoWall.appendChild(img);
         });
 
-        // 动态显示从指定日期到现在的时间差
+        // 时间差的初始计算
+        const targetDate = new Date('2024-07-26T00:00:00'); // 指定日期
+        let timerInterval = null; // 用于存储 setInterval 的 ID
+        let isPaused = false; // 当前倒计时是否暂停
+
+        // 更新页面中的时间
         function updateTimeElapsed() {
-            const targetDate = new Date('2024-07-26T00:00:00'); // 指定日期
             const now = new Date(); // 当前时间
 
             // 计算时间差（以毫秒为单位）
@@ -235,8 +264,33 @@
                 ` ${days}days|${hours}h|${minutes}min|${seconds}s `;
         }
 
-        // 每秒更新一次时间显示
-        setInterval(updateTimeElapsed, 1000);
+        // 启动倒计时
+        function startTimer() {
+            timerInterval = setInterval(updateTimeElapsed, 1000);
+        }
+
+        // 暂停倒计时
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // 切换倒计时的状态（暂停/继续）
+        function toggleTimer() {
+            const pauseButton = document.getElementById('pauseButton');
+            if (isPaused) {
+                // 倒计时继续
+                startTimer();
+                pauseButton.textContent = "Happy Ending/Bad Ending"; // 修改按钮文本
+            } else {
+                // 倒计时暂停
+                stopTimer();
+                pauseButton.textContent = "Continue"; // 修改按钮文本
+            }
+            isPaused = !isPaused; // 切换状态
+        }
+
+        // 初始启动倒计时
+        startTimer();
 
         // 留言板功能逻辑
         const messageList = document.getElementById('messageList');
@@ -246,9 +300,14 @@
             const messageText = messageInput.value.trim();
 
             if (messageText) {
+                // 获取当前时间
+                const now = new Date();
+                const formattedTime = formatCurrentTime(now);
+
+                // 创建留言元素
                 const message = document.createElement('div');
                 message.classList.add('message');
-                message.textContent = messageText;
+                message.innerHTML = `${messageText} <span class="message-time">${formattedTime}</span>`;
 
                 // 将新留言插入到留言列表中
                 messageList.appendChild(message);
@@ -259,6 +318,17 @@
                 // 滚动到底部显示最新留言
                 messageList.scrollTop = messageList.scrollHeight;
             }
+        }
+
+        // 格式化当前时间为 "YYYY-MM-DD HH:MM:SS"
+        function formatCurrentTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
     </script>
 </body>
