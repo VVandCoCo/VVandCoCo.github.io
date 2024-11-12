@@ -76,6 +76,61 @@
             color: #333;
             margin-top: 20px;
         }
+
+        /* 留言板样式 */
+        .message-board {
+            margin: 50px auto 20px;
+            width: 80%;
+            text-align: left;
+        }
+
+        .message-board textarea {
+            width: 100%;
+            height: 100px;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message-board button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .message-board button:hover {
+            background-color: #555;
+        }
+
+        /* 留言列表样式 */
+        .message-list {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            height: 150px;
+            overflow-y: auto;
+            font-size: 16px;
+        }
+
+        /* 单条留言样式 */
+        .message {
+            opacity: 0;
+            margin-bottom: 10px;
+            animation: showLine 0.5s forwards;
+        }
+
+        /* 留言逐行显示动画 */
+        @keyframes showLine {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -94,6 +149,15 @@
         <!-- 照片墙容器 -->
         <div class="photo-wall" id="photoWall">
             <!-- 照片将通过 JavaScript 动态插入 -->
+        </div>
+
+        <!-- 留言板区域 -->
+        <div class="message-board">
+            <textarea id="messageInput" placeholder="Leave a message..."></textarea>
+            <button onclick="submitMessage()">Submit</button>
+
+            <!-- 留言列表 -->
+            <div class="message-list" id="messageList"></div>
         </div>
     </section>
 
@@ -173,6 +237,29 @@
 
         // 每秒更新一次时间显示
         setInterval(updateTimeElapsed, 1000);
+
+        // 留言板功能逻辑
+        const messageList = document.getElementById('messageList');
+
+        function submitMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value.trim();
+
+            if (messageText) {
+                const message = document.createElement('div');
+                message.classList.add('message');
+                message.textContent = messageText;
+
+                // 将新留言插入到留言列表中
+                messageList.appendChild(message);
+
+                // 清空输入框
+                messageInput.value = '';
+
+                // 滚动到底部显示最新留言
+                messageList.scrollTop = messageList.scrollHeight;
+            }
+        }
     </script>
 </body>
 </html>
