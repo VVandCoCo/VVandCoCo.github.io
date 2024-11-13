@@ -159,7 +159,7 @@
     <header>
         <h1>~~~~~~~~~~~~~</h1>
     </header>
-    
+
     <section>
         <article>
             <h2>VV and CoCo</h2>
@@ -246,6 +246,11 @@
         let timerInterval = null; // 用于存储 setInterval 的 ID
         let isPaused = false; // 当前倒计时是否暂停
 
+        // 从 localStorage 读取暂停状态
+        if(localStorage.getItem('isPaused') !== null) {
+            isPaused = localStorage.getItem('isPaused') === 'true';
+        }
+
         // 更新页面中的时间
         function updateTimeElapsed() {
             const now = new Date(); // 当前时间
@@ -266,7 +271,9 @@
 
         // 启动倒计时
         function startTimer() {
-            timerInterval = setInterval(updateTimeElapsed, 1000);
+            if (!isPaused) {
+                timerInterval = setInterval(updateTimeElapsed, 1000);
+            }
         }
 
         // 暂停倒计时
@@ -287,6 +294,9 @@
                 pauseButton.textContent = "Continue"; // 修改按钮文本
             }
             isPaused = !isPaused; // 切换状态
+
+            // 保存暂停状态到 localStorage
+            localStorage.setItem('isPaused', isPaused.toString());
         }
 
         // 初始启动倒计时
@@ -294,6 +304,14 @@
 
         // 留言板功能逻辑
         const messageList = document.getElementById('messageList');
+
+        // 从 localStorage 加载留言
+        function loadMessages() {
+            const storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
+            storedMessages.forEach(message => {
+                displayMessage(message.text, message.time);
+            });
+        }
 
         function submitMessage() {
             const messageInput = document.getElementById('messageInput');
@@ -305,12 +323,12 @@
                 const formattedTime = formatCurrentTime(now);
 
                 // 创建留言元素
-                const message = document.createElement('div');
-                message.classList.add('message');
-                message.innerHTML = `${messageText} <span class="message-time">${formattedTime}</span>`;
+                displayMessage(messageText, formattedTime);
 
-                // 将新留言插入到留言列表中
-                messageList.appendChild(message);
+                // 保存留言到 localStorage
+                const storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
+                storedMessages.push({ text: messageText, time: formattedTime });
+                localStorage.setItem('messages', JSON.stringify(storedMessages));
 
                 // 清空输入框
                 messageInput.value = '';
@@ -318,6 +336,14 @@
                 // 滚动到底部显示最新留言
                 messageList.scrollTop = messageList.scrollHeight;
             }
+        }
+
+        // 显示留言到页面上
+        function displayMessage(messageText, formattedTime) {
+            const message = document.createElement('div');
+            message.classList.add('message');
+            message.innerHTML = `${messageText} <span class="message-time">${formattedTime}</span>`;
+            messageList.appendChild(message);
         }
 
         // 格式化当前时间为 "YYYY-MM-DD HH:MM:SS"
@@ -330,6 +356,10 @@
             const seconds = String(date.getSeconds()).padStart(2, '0');
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
+
+        // 页面加载时，初始化留言
+        loadMessages();
+
     </script>
 </body>
 </html>
